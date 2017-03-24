@@ -24,7 +24,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 public class IterablesBenchmark {
 
-    public static void main(String[] args) throws RunnerException {
+    public static void main(String... args) throws RunnerException {
         Options options = new OptionsBuilder()
             .include(CollectListToList.class.getSimpleName())
             .forks(1)
@@ -35,7 +35,7 @@ public class IterablesBenchmark {
 
     private static long counter;
 
-    private static final void doSomething() {
+    private static void doSomething() {
         counter++;
     }
 

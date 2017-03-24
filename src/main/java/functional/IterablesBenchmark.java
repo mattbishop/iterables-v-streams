@@ -49,7 +49,7 @@ public class IterablesBenchmark {
         return s;
     };
 
-    private static <T> Collector<T, ImmutableList.Builder<T>, ImmutableList<T>> immutableList() {
+    private static <T> Collector<T, ImmutableList.Builder<T>, ImmutableList<T>> toImmutableList() {
         return Collector.of(
             ImmutableList.Builder::new,
             ImmutableList.Builder::add,
@@ -118,7 +118,7 @@ public class IterablesBenchmark {
             List<String> result = list
                 .stream()
                 .map(streamsIdentity)
-                .collect(immutableList());
+                .collect(toImmutableList());
             doSomethingAfter(result);
         }
     }

@@ -2,6 +2,7 @@ package functional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -32,23 +33,28 @@ public class IterablesBenchmark {
         new Runner(options).run();
     }
 
-    private static final com.google.common.base.Function<String, String> guavaIdentity = new com.google.common.base.Function<String, String>() {
-        @Override
-        public String apply(String s) {
-            return s;
-        }
+    private static long counter;
+
+    private static final void doSomething() {
+        counter++;
+    }
+
+    private static final com.google.common.base.Function<String, String> guavaIdentity = s -> {
+        doSomething();
+        return s;
     };
 
-    private static final java.util.function.Function<String, String> streamsIdentity = new java.util.function.Function<String, String>() {
-        @Override
-        public String apply(String s) {
-            return s;
-        }
+    private static final java.util.function.Function<String, String> streamsIdentity = s -> {
+        doSomething();
+        return s;
     };
 
     private static <T> Collector<T, ImmutableList.Builder<T>, ImmutableList<T>> immutableList() {
-        return Collector.of(ImmutableList.Builder::new, ImmutableList.Builder::add,
-            (l, r) -> l.addAll(r.build()), ImmutableList.Builder<T>::build);
+        return Collector.of(
+            ImmutableList.Builder::new,
+            ImmutableList.Builder::add,
+            (l, r) -> l.addAll(r.build()),
+            ImmutableList.Builder<T>::build);
     }
 
 
@@ -57,7 +63,7 @@ public class IterablesBenchmark {
         Arrays.fill(data, "hello");
     }
 
-    private static List<String> list = Arrays.asList(data);
+    private static final List<String> list = Arrays.asList(data);
 
     @BenchmarkMode(value = Mode.Throughput)
     @Warmup(iterations = 5)
@@ -66,39 +72,61 @@ public class IterablesBenchmark {
 
         @Benchmark
         public void iterate() {
-            List<String> result = new ArrayList<String>(list.size());
+            List<String> result = new ArrayList<>(list.size());
             for (String each : list) {
+                doSomething();
                 result.add(each);
             }
+            doSomethingAfter(result);
         }
 
         @Benchmark
         public void iterate_immutable() {
             ImmutableList.Builder<String> builder = ImmutableList.builder();
             for (String each : list) {
+                doSomething();
                 builder.add(each);
             }
             List<String> result = builder.build();
+            doSomethingAfter(result);
         }
 
         @Benchmark
         public void guava() {
-            List<String> result = ImmutableList.copyOf(transform(list, guavaIdentity));
+            List<String> result = Lists.newArrayList(transform(list, guavaIdentity));
+            doSomethingAfter(result);
         }
 
         @Benchmark
         public void guava_immutable() {
-            List<String> result = Lists.newArrayList(transform(list, guavaIdentity));
+            List<String> result = ImmutableList.copyOf(transform(list, guavaIdentity));
+            doSomethingAfter(result);
         }
 
         @Benchmark
         public void streams() {
-            List<String> result = list.stream().map(streamsIdentity).collect(Collectors.toList());
+            List<String> result = list
+                .stream()
+                .map(streamsIdentity)
+                .collect(Collectors.toList());
+            doSomethingAfter(result);
+
         }
 
         @Benchmark
         public void streams_immutable() {
-            List<String> result = list.stream().map(streamsIdentity).collect(immutableList());
+            List<String> result = list
+                .stream()
+                .map(streamsIdentity)
+                .collect(immutableList());
+            doSomethingAfter(result);
         }
+    }
+
+    private static void doSomethingAfter(Collection<String> result) {
+        if (result.size() != counter) {
+            System.out.println("non-trivial data test");
+        }
+        counter = 0;
     }
 }

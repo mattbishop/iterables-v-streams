@@ -58,7 +58,7 @@ public class IterablesBenchmark {
     }
 
 
-    private static final String[] data = new String[10];
+    private static final String[] data = new String[100];
     static {
         Arrays.fill(data, "hello");
     }
@@ -121,11 +121,30 @@ public class IterablesBenchmark {
                 .collect(toImmutableList());
             doSomethingAfter(result);
         }
+
+        @Benchmark
+        public void parallel_streams() {
+            List<String> result = list
+                .parallelStream()
+                .map(streamsIdentity)
+                .collect(Collectors.toList());
+            doSomethingAfter(result);
+
+        }
+
+        @Benchmark
+        public void parallel_streams_immutable() {
+            List<String> result = list
+                .parallelStream()
+                .map(streamsIdentity)
+                .collect(toImmutableList());
+            doSomethingAfter(result);
+        }
     }
 
     private static void doSomethingAfter(Collection<String> result) {
         if (result.size() != counter) {
-            System.out.println("non-trivial data test");
+            counter = 1;
         }
         counter = 0;
     }

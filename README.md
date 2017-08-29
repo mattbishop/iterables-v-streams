@@ -14,13 +14,15 @@ This test requires Maven 3.3+ and Java 8. From the CLI:
 ## Results (bigger scores are better)
 ```
 # VM version: JDK 1.8.0_77, VM 25.77-b03
-Benchmark                                                         Mode  Cnt        Score        Error  Units
-IterablesBenchmark.CollectListToList.guava                       thrpt    5  1123001.433 ±  45634.534  ops/s
-IterablesBenchmark.CollectListToList.guava_immutable             thrpt    5  1143280.767 ±  73951.884  ops/s
-IterablesBenchmark.CollectListToList.iterate                     thrpt    5  1609121.538 ±  31361.499  ops/s
-IterablesBenchmark.CollectListToList.iterate_immutable           thrpt    5  1256231.852 ± 143288.242  ops/s
-IterablesBenchmark.CollectListToList.parallel_streams            thrpt    5    35053.087 ±   2631.421  ops/s
-IterablesBenchmark.CollectListToList.parallel_streams_immutable  thrpt    5    34687.248 ±   3634.177  ops/s
-IterablesBenchmark.CollectListToList.streams                     thrpt    5  1108512.767 ±  88668.641  ops/s
-IterablesBenchmark.CollectListToList.streams_immutable           thrpt    5  1213230.572 ± 144316.935  ops/s
+Benchmark                                                        Mode  Cnt        Score       Error  Units
+IterablesBenchmark.CollectListToList.for_loop                   thrpt    5  1604355.586 ± 69785.889  ops/s
+IterablesBenchmark.CollectListToList.for_loop_immutable         thrpt    5  1273970.437 ± 53283.995  ops/s
+IterablesBenchmark.CollectListToList.foreach                    thrpt    5  2367348.551 ± 88210.294  ops/s
+IterablesBenchmark.CollectListToList.foreach_immutable          thrpt    5  1326800.061 ± 46750.209  ops/s
+IterablesBenchmark.CollectListToList.guava_transform            thrpt    5   991420.345 ± 37108.552  ops/s
+IterablesBenchmark.CollectListToList.guava_transform_immutable  thrpt    5  1159346.619 ± 25255.831  ops/s
+IterablesBenchmark.CollectListToList.stream_foreach             thrpt    5  1493196.809 ± 52525.728  ops/s
+IterablesBenchmark.CollectListToList.stream_foreach_immutable   thrpt    5  1744172.947 ± 50315.796  ops/s
+IterablesBenchmark.CollectListToList.stream_map                 thrpt    5  1160352.162 ± 31191.902  ops/s
+IterablesBenchmark.CollectListToList.stream_map_immutable       thrpt    5  1245420.440 ± 41924.844  ops/s
 ```

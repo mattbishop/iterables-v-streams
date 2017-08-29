@@ -27,6 +27,7 @@ public class IterablesBenchmark {
     public static void main(String... args) throws RunnerException {
         Options options = new OptionsBuilder()
             .include(CollectListToList.class.getSimpleName())
+            .shouldDoGC(true)
             .forks(1)
             .build();
 
@@ -65,13 +66,34 @@ public class IterablesBenchmark {
 
     private static final List<String> list = Arrays.asList(data);
 
+
     @BenchmarkMode(value = Mode.Throughput)
     @Warmup(iterations = 5)
     @Measurement(iterations = 5)
     public static class CollectListToList {
+        @Benchmark
+        public void foreach() {
+            List<String> result = new ArrayList<>(list.size());
+            list.forEach(each -> {
+                doSomething();
+                result.add(each);
+            });
+            doSomethingAfter(result);
+        }
 
         @Benchmark
-        public void iterate() {
+        public void foreach_immutable() {
+            ImmutableList.Builder<String> builder = ImmutableList.builder();
+            list.forEach(each -> {
+                doSomething();
+                builder.add(each);
+            });
+            List<String> result = builder.build();
+            doSomethingAfter(result);
+        }
+
+        @Benchmark
+        public void for_loop() {
             List<String> result = new ArrayList<>(list.size());
             for (String each : list) {
                 doSomething();
@@ -81,7 +103,7 @@ public class IterablesBenchmark {
         }
 
         @Benchmark
-        public void iterate_immutable() {
+        public void for_loop_immutable() {
             ImmutableList.Builder<String> builder = ImmutableList.builder();
             for (String each : list) {
                 doSomething();
@@ -92,19 +114,44 @@ public class IterablesBenchmark {
         }
 
         @Benchmark
-        public void guava() {
+        public void guava_transform() {
             List<String> result = Lists.newArrayList(transform(list, guavaIdentity));
             doSomethingAfter(result);
         }
 
         @Benchmark
-        public void guava_immutable() {
+        public void guava_transform_immutable() {
             List<String> result = ImmutableList.copyOf(transform(list, guavaIdentity));
             doSomethingAfter(result);
         }
 
         @Benchmark
-        public void streams() {
+        public void stream_foreach() {
+            List<String> result = new ArrayList<>(list.size());
+            list
+                .stream()
+                .forEach(each -> {
+                    doSomething();
+                    result.add(each);
+                });
+            doSomethingAfter(result);
+        }
+
+        @Benchmark
+        public void stream_foreach_immutable() {
+            ImmutableList.Builder<String> builder = ImmutableList.builder();
+            list
+                .stream()
+                .forEach(each -> {
+                    doSomething();
+                    builder.add(each);
+                });
+            List<String> result = builder.build();
+            doSomethingAfter(result);
+        }
+
+        @Benchmark
+        public void stream_map() {
             List<String> result = list
                 .stream()
                 .map(streamsIdentity)
@@ -114,28 +161,9 @@ public class IterablesBenchmark {
         }
 
         @Benchmark
-        public void streams_immutable() {
+        public void stream_map_immutable() {
             List<String> result = list
                 .stream()
-                .map(streamsIdentity)
-                .collect(toImmutableList());
-            doSomethingAfter(result);
-        }
-
-        @Benchmark
-        public void parallel_streams() {
-            List<String> result = list
-                .parallelStream()
-                .map(streamsIdentity)
-                .collect(Collectors.toList());
-            doSomethingAfter(result);
-
-        }
-
-        @Benchmark
-        public void parallel_streams_immutable() {
-            List<String> result = list
-                .parallelStream()
                 .map(streamsIdentity)
                 .collect(toImmutableList());
             doSomethingAfter(result);

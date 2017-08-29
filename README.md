@@ -11,7 +11,7 @@ It compares performance of collecting to both Java ArrayList and Guava Immutable
 This test requires Maven 3.3+ and Java 8. From the CLI:
 `mvn clean test`
 
-## Results
+## Results (bigger scores are better)
 ```
 # VM version: JDK 1.8.0_77, VM 25.77-b03
 Benchmark                                                         Mode  Cnt        Score        Error  Units
